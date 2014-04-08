@@ -1,11 +1,13 @@
 require "./pieces.rb"
 
 class Board
-  attr_accessor :spaces
+  attr_accessor :spaces, :pieces
+  OPP_COLOR = {:black => :white, :white => :black}
 
-  def initialize
+  def initialize(options = {})
     @spaces = Array.new(8) { Array.new(8) }
-    populate
+    @pieces = {:white => [], :black => []}
+    populate unless options[:empty]
   end
 
   def populate
@@ -38,13 +40,62 @@ class Board
       @spaces[row].each_index do |col|
         color = colors[row]
         if piece_sets[row] == :pawns
-          @spaces[row][col] = Pawn.new([col, row], self, color)
+          pawn = Pawn.new([col, row], self, color)
+          @spaces[row][col] = pawn
+          @pieces[color] << pawn
         else
-          @spaces[row][col] = others[color][col].new([col, row], self, color)
+          piece = others[color][col].new([col, row], self, color)
+          @spaces[row][col] = piece
+          @pieces[color] << piece
         end
       end
     end
 
+  end
+
+  def dup
+    dup_board = self.class.new({empty: true})
+
+    @pieces[:white].each do |piece_to_dup|
+      piece = piece_to_dup.dup
+      dup_board.spaces[piece.position.last][piece.position.first] = piece
+      dup_board.pieces[:white] << piece
+    end
+
+    @pieces[:black].each do |piece_to_dup|
+      piece = piece_to_dup.dup
+      dup_board.spaces[piece.position.last][piece.position.first] = piece
+      dup_board.pieces[:black] << piece
+    end
+  end
+
+  def move(start_pos, end_pos)
+    piece = self[start_pos]
+    raise "No piece at start." unless piece
+
+    if piece.moves.include?(end_pos)
+      piece.position = end_pos
+      @space[end_pos.last][end_pos.first] = piece
+      @space[start_pos.last][start_pos.first] = nil
+    else
+      raise "Invalid move."
+    end
+    nil
+  end
+
+  def in_check?(color)
+    king_pos = find_king_position(color)
+
+    @pieces[OPP_COLOR[color]].each do |piece|
+      return true if piece.moves.include?(king_pos)
+    end
+    false
+  end
+
+  def find_king_position(color)
+    @pieces[color].each do |piece|
+      return piece.position if piece.is_a?(King)
+    end
   end
 
   def off_board?(pos)
