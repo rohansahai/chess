@@ -67,6 +67,7 @@ class Board
       dup_board.spaces[piece.position.last][piece.position.first] = piece
       dup_board.pieces[:black] << piece
     end
+    dup_board
   end
 
   def move(start_pos, end_pos)
@@ -128,7 +129,18 @@ new_board = Board.new
 
 new_board.spaces.each do |row|
   row.each do |tile|
+    next if tile.nil?
     p tile.class
+    p tile.position
+  end
+end
+puts "DUPING BEGIN"
+dup_board = new_board.dup
+dup_board.spaces.each do |row|
+  row.each do |tile|
+    next if tile.nil?
+    p tile.class
+    p tile.position
   end
 end
 

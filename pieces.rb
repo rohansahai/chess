@@ -39,8 +39,8 @@ class Piece
     raise "Stop being an asshole, make a real piece"
   end
 
-  def evaluate_move(move)
-
+  def dup
+    self.class.new(@position, @board, @color)
   end
 
 end
