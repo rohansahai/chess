@@ -125,22 +125,22 @@ class Board
 
 end
 
-new_board = Board.new
-
-new_board.spaces.each do |row|
-  row.each do |tile|
-    next if tile.nil?
-    p tile.class
-    p tile.position
-  end
-end
-puts "DUPING BEGIN"
-dup_board = new_board.dup
-dup_board.spaces.each do |row|
-  row.each do |tile|
-    next if tile.nil?
-    p tile.class
-    p tile.position
-  end
-end
+# new_board = Board.new
+#
+# new_board.spaces.each do |row|
+#   row.each do |tile|
+#     next if tile.nil?
+#     p tile.class
+#     p tile.position
+#   end
+# end
+# puts "DUPING BEGIN"
+# dup_board = new_board.dup
+# dup_board.spaces.each do |row|
+#   row.each do |tile|
+#     next if tile.nil?
+#     p tile.class
+#     p tile.position
+#   end
+# end
 
