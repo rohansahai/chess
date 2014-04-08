@@ -20,19 +20,23 @@ class Piece
     @color = color
   end
 
-  def moves(modifiers)
+  def valid_moves(modifiers)
     moves = []
     modifiers.each do |direction|
       direction.each do |modifier|
         new_x = modifier.first + @position.first
         new_y = modifier.last + @position.last
         new_move =  [new_x, new_y]
-        #break if board.off_board?(new_move) || board.my_piece?(new_move, @color)
+        break if board.off_board?(new_move) || board.my_piece?(new_move, @color)
         moves << new_move
-        #break if board.enemy_piece?(new_move)
+        break if board[new_move] #will return nil if no piece
       end
     end
     moves
+  end
+
+  def moves
+    raise "Stop being an asshole, make a real piece"
   end
 
   def evaluate_move(move)
@@ -64,7 +68,7 @@ end
 
 class King < Piece
   def moves
-    super(Piece::ORTHOGONAL + Piece::DIAGONAL)
+    valid_moves(Piece::ORTHOGONAL + Piece::DIAGONAL)
   end
 end
 
@@ -81,43 +85,42 @@ class Knight < Piece
   ]
 
   def moves
-    super(KNIGHT_MOVES)
+    valid_moves(KNIGHT_MOVES)
   end
 end
 
 class Bishop < SlidingPiece
 
-
   def moves
-    super(move_dirs(Piece::DIAGONAL))
+    valid_moves(move_dirs(Piece::DIAGONAL))
   end
 end
 
 class Rook < SlidingPiece
   def moves
-    super(move_dirs(Piece::ORTHOGONAL))
+    valid_moves(move_dirs(Piece::ORTHOGONAL))
   end
 end
 
 class Queen < SlidingPiece
   def moves
-    super(move_dirs(Piece::ORTHOGONAL + Piece::DIAGONAL))
+    valid_moves(move_dirs(Piece::ORTHOGONAL + Piece::DIAGONAL))
   end
 end
 
-class Pawn
+class Pawn < Piece
 
 end
 
-
-puts "Queen:"
-p Queen.new([0,0]).moves
-puts "Bishop:"
-p Bishop.new([0,0]).moves
-puts "Rook:"
-p Rook.new([0,0]).moves
-puts "Knight:"
-p Knight.new([0,0]).moves
-puts "King:"
-p King.new([0,0]).moves
+#
+# puts "Queen:"
+# p Queen.new([0,0]).moves
+# puts "Bishop:"
+# p Bishop.new([0,0]).moves
+# puts "Rook:"
+# p Rook.new([0,0]).moves
+# puts "Knight:"
+# p Knight.new([0,0]).moves
+# puts "King:"
+# p King.new([0,0]).moves
 
