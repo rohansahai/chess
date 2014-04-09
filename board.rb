@@ -5,6 +5,17 @@ require 'debugger'
 class Board
   attr_accessor :spaces, :pieces
   OPP_COLOR = {:black => :white, :white => :black}
+  GRID_COLOR = {:light_black => :white, :white => :light_black}
+  GRID = {
+    0 => '8',
+    1 => '7',
+    2 => '6',
+    3 => '5',
+    4 => '4',
+    5 => '3',
+    6 => '2',
+    7 => '1'
+  }
 
   def initialize(options = {})
     @spaces = Array.new(8) { Array.new(8) }
@@ -58,12 +69,21 @@ class Board
 
   def render
     system("clear")
-    puts "    " + ('a'..'h').to_a.join('   ')
+    puts "   " + ('a'..'h').to_a.join('  ')
+    square_color = :white
     @spaces.each_with_index do |row, r_idx|
-      puts ''.colorize(:background => :light_magenta)
+      # puts ''.colorize(:background => :light_magenta)
       d_row = row.map{ |piece| piece ? " #{piece.to_show} " : ' _ ' }
-      puts r_idx.to_s + "  " +  d_row.join(' ').colorize(:background => :light_magenta)
+      print GRID[r_idx] + ' '
+      d_row.each do |space|
+        print space.colorize(:background => square_color)
+        square_color = GRID_COLOR[square_color]
+      end
+      puts ' ' + GRID[r_idx]
+      square_color = GRID_COLOR[square_color]
     end
+    puts "   " + ('a'..'h').to_a.join('  ')
+
     nil
   end
 

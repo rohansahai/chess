@@ -76,7 +76,7 @@ class SlidingPiece < Piece
 end
 
 class King < Piece
-  DISPLAY = {:white => "\u2654".white, :black => "\u265a".black}
+  DISPLAY = {:white => "\u265a".light_white, :black => "\u265a".black}
   def moves
     valid_moves
   end
@@ -91,7 +91,7 @@ class King < Piece
 end
 
 class Knight < Piece
-  DISPLAY = {:white => "\u2658".white, :black => "\u265e".black}
+  DISPLAY = {:white => "\u265e".light_white, :black => "\u265e".black}
   KNIGHT_MOVES = [
     [[1, 2]],
     [[2, 1]],
@@ -117,7 +117,7 @@ class Knight < Piece
 end
 
 class Bishop < SlidingPiece
-  DISPLAY = {:white => "\u2657".white, :black => "\u265d".black}
+  DISPLAY = {:white => "\u265d".light_white, :black => "\u265d".black}
   def moves
     valid_moves
   end
@@ -132,7 +132,7 @@ class Bishop < SlidingPiece
 end
 
 class Rook < SlidingPiece
-  DISPLAY = {:white => "\u2656".white, :black => "\u265c".black}
+  DISPLAY = {:white => "\u265c".light_white, :black => "\u265c".black}
   def moves
     valid_moves
   end
@@ -147,7 +147,7 @@ class Rook < SlidingPiece
 end
 
 class Queen < SlidingPiece
-  DISPLAY = {:white => "\u2655".white, :black => "\u265b".black}
+  DISPLAY = {:white => "\u265b".light_white, :black => "\u265b".black}
   def moves
     valid_moves
   end
@@ -162,7 +162,7 @@ class Queen < SlidingPiece
 end
 
 class Pawn < Piece
-  DISPLAY = {:white => "\u2659".white, :black => "\u265f".black}
+  DISPLAY = {:white => "\u265f".light_white, :black => "\u265f".black}
   PAWN_MOVES =
   {
     :white =>
