@@ -58,7 +58,7 @@ class Board
 
   def render
     system("clear")
-    puts "    " + (0..7).to_a.join('   ')
+    puts "    " + ('a'..'h').to_a.join('   ')
     @spaces.each_with_index do |row, r_idx|
       puts ''.colorize(:background => :light_magenta)
       d_row = row.map{ |piece| piece ? " #{piece.to_show} " : ' _ ' }
@@ -82,7 +82,7 @@ class Board
       @spaces[end_pos.last][end_pos.first] = piece
       @spaces[start_pos.last][start_pos.first] = nil
     else
-      raise "Invalid move."
+      raise InvalidMove
     end
     self.render
     nil
@@ -100,8 +100,6 @@ class Board
     king_pos = find_king_position(color)
 
     self.pieces[OPP_COLOR[color]].each do |piece|
-      piece.class if piece.class == Queen
-      piece.moves if piece.class == Queen
       return true if piece.moves.include?(king_pos)
     end
     false
@@ -110,12 +108,9 @@ class Board
   def checkmate?(color)
     @pieces[color].each do |piece|
       checkmate = piece.valid_moves.all? do |move|
-        p move if piece.class == King
-
         move_to_check?(piece.position, move, piece.color)
       end
-      p checkmate
-      #debugger
+
       return false unless checkmate
     end
     true
@@ -160,17 +155,20 @@ end
 class OffBoardException < RuntimeError
 end
 
-new_board = Board.new
+class InvalidMove < RuntimeError
+end
 
-puts "we are moving the pawn"
-new_board.move([5, 6], [5, 5]) #white pawn
-puts "throw me an error"
-new_board.move([4, 1], [4, 3]) #pawn moves out of the way too late
-puts "throw me an error (final white pawn - move_to_check test)"
-new_board.move([6, 6], [6, 4]) #pawn moves into check
-puts "we are moving the queen"
-new_board.move([3, 0], [7, 4]) #black queen over a pawn
-p new_board.checkmate?(:white)
+# new_board = Board.new
+#
+# puts "we are moving the pawn"
+# new_board.move([5, 6], [5, 5]) #white pawn
+# puts "throw me an error"
+# new_board.move([4, 1], [4, 3]) #pawn moves out of the way too late
+# puts "throw me an error (final white pawn - move_to_check test)"
+# new_board.move([6, 6], [6, 4]) #pawn moves into check
+# puts "we are moving the queen"
+# new_board.move([3, 0], [7, 4]) #black queen over a pawn
+# p new_board.checkmate?(:white)
 
 #
 # new_board.spaces.each do |row|
