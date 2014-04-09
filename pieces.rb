@@ -1,5 +1,8 @@
+require 'colorize'
+require 'debugger'
+
 class Piece
-  attr_accessor :position, :board
+  attr_accessor :position, :board, :color
 
   ORTHOGONAL = [
     [[-1, 0]],
@@ -27,7 +30,9 @@ class Piece
         new_x = modifier.first + @position.first
         new_y = modifier.last + @position.last
         new_move =  [new_x, new_y]
+
         break if board.off_board?(new_move) || board.my_piece?(new_move, @color)
+        # break if move_to_check?(new_move)
         moves << new_move
         break if board[new_move] #will return nil if no piece
       end
@@ -39,8 +44,8 @@ class Piece
     raise "Stop being an asshole, make a real piece"
   end
 
-  def dup
-    self.class.new(@position, @board, @color)
+  def dup(board)
+    self.class.new(@position.dup, board, @color)
   end
 
   def to_show
@@ -71,7 +76,7 @@ class SlidingPiece < Piece
 end
 
 class King < Piece
-  DISPLAY = {:white => "\u2654", :black => "\u265a"}
+  DISPLAY = {:white => "\u2654".white, :black => "\u265a".black}
   def moves
     valid_moves(Piece::ORTHOGONAL + Piece::DIAGONAL)
   end
@@ -82,7 +87,7 @@ class King < Piece
 end
 
 class Knight < Piece
-  DISPLAY = {:white => "\u2658", :black => "\u265e"}
+  DISPLAY = {:white => "\u2658".white, :black => "\u265e".black}
   KNIGHT_MOVES = [
     [[1, 2]],
     [[2, 1]],
@@ -104,7 +109,7 @@ class Knight < Piece
 end
 
 class Bishop < SlidingPiece
-  DISPLAY = {:white => "\u2657", :black => "\u265d"}
+  DISPLAY = {:white => "\u2657".white, :black => "\u265d".black}
   def moves
     valid_moves(move_dirs(Piece::DIAGONAL))
   end
@@ -115,7 +120,7 @@ class Bishop < SlidingPiece
 end
 
 class Rook < SlidingPiece
-  DISPLAY = {:white => "\u2656", :black => "\u265c"}
+  DISPLAY = {:white => "\u2656".white, :black => "\u265c".black}
   def moves
     valid_moves(move_dirs(Piece::ORTHOGONAL))
   end
@@ -126,7 +131,7 @@ class Rook < SlidingPiece
 end
 
 class Queen < SlidingPiece
-  DISPLAY = {:white => "\u2655", :black => "\u265b"}
+  DISPLAY = {:white => "\u2655".white, :black => "\u265b".black}
   def moves
     valid_moves(move_dirs(Piece::ORTHOGONAL + Piece::DIAGONAL))
   end
@@ -137,7 +142,7 @@ class Queen < SlidingPiece
 end
 
 class Pawn < Piece
-  DISPLAY = {:white => "\u2659", :black => "\u265f"}
+  DISPLAY = {:white => "\u2659".white, :black => "\u265f".black}
   PAWN_MOVES =
   {
     :white =>
@@ -163,20 +168,25 @@ class Pawn < Piece
     moves = []
     modifiers.each do |direction|
       direction.each do |modifier|
-        new_x = modifier.first + @position.first
-        new_y = modifier.last + @position.last
-        new_move =  [new_x, new_y]
+        new_x = modifier.first + self.position.first
+        new_y = modifier.last + self.position.last
+        new_move = [new_x, new_y]
 
-        if new_move.first == 0
-          #break if board.off_board?(new_move) || board[new_move]
+        if modifier.first == 0
+          break if board.off_board?(new_move)
+          break if board[new_move]
         else
-          #break if !board[new_move] || board.my_piece?(new_move, @color)
+          break if board.off_board?(new_move)
+          break if !board[new_move]
+          break if board.my_piece?(new_move, @color)
         end
+
+        # break if move_to_check?(new_move)
 
         moves << new_move
 
-        break if @color == :black && @position.last !=1
-        break if @color == :white && @position.last !=6
+        break if @color == :black && @position.last != 1
+        break if @color == :white && @position.last != 6
       end
     end
     moves
@@ -200,8 +210,8 @@ end
 # puts "King:"
 # p King.new([0,0]).moves
 
-puts "Pawn: "
-p Pawn.new([0,6], nil, :white).to_show
-p Pawn.new([0,1], nil, :black).to_show
+# puts "Pawn: "
+# p Pawn.new([0,6], nil, :white).to_show
+# p Pawn.new([0,1], nil, :black).to_show
 
 

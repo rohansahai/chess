@@ -1,4 +1,6 @@
 require "./pieces.rb"
+require 'colorize'
+require 'debugger'
 
 class Board
   attr_accessor :spaces, :pieces
@@ -14,26 +16,14 @@ class Board
     piece_sets = { 0 => :other, 1 => :pawns, 6 => :pawns, 7 => :other }
     colors = { 0 => :black, 1 => :black, 6 => :white, 7 => :white }
     others = {
-      black: {
-        0 => Rook,
-        1 => Knight,
-        2 => Bishop,
-        3 => Queen,
-        4 => King,
-        5 => Bishop,
-        6 => Knight,
-        7 => Rook
-      },
-      white: {
-        0 => Rook,
-        1 => Knight,
-        2 => Bishop,
-        3 => King,
-        4 => Queen,
-        5 => Bishop,
-        6 => Knight,
-        7 => Rook
-      }
+      0 => Rook,
+      1 => Knight,
+      2 => Bishop,
+      3 => Queen,
+      4 => King,
+      5 => Bishop,
+      6 => Knight,
+      7 => Rook
     }
 
     [0, 1, 6, 7].each do |row|
@@ -44,7 +34,7 @@ class Board
           @spaces[row][col] = pawn
           @pieces[color] << pawn
         else
-          piece = others[color][col].new([col, row], self, color)
+          piece = others[col].new([col, row], self, color)
           @spaces[row][col] = piece
           @pieces[color] << piece
         end
@@ -55,33 +45,56 @@ class Board
 
   def dup
     dup_board = self.class.new({empty: true})
-
-    @pieces[:white].each do |piece_to_dup|
-      piece = piece_to_dup.dup
-      dup_board.spaces[piece.position.last][piece.position.first] = piece
-      dup_board.pieces[:white] << piece
-    end
-
-    @pieces[:black].each do |piece_to_dup|
-      piece = piece_to_dup.dup
-      dup_board.spaces[piece.position.last][piece.position.first] = piece
-      dup_board.pieces[:black] << piece
+    #can reduce these loops to single nested loop
+    [:white, :black].each do |color|
+      @pieces[color].each do |piece_to_dup|
+        piece = piece_to_dup.dup(dup_board)
+        dup_board.spaces[piece.position.last][piece.position.first] = piece
+        dup_board.pieces[color] << piece
+      end
     end
     dup_board
+  end
+
+  def render
+    system("clear")
+    puts "    " + (0..7).to_a.join('   ')
+    @spaces.each_with_index do |row, r_idx|
+      puts ''.colorize(:background => :light_magenta)
+      d_row = row.map{ |piece| piece ? " #{piece.to_show} " : ' _ ' }
+      puts r_idx.to_s + "  " +  d_row.join(' ').colorize(:background => :light_magenta)
+    end
+    nil
   end
 
   def move(start_pos, end_pos)
     piece = self[start_pos]
     raise "No piece at start." unless piece
+    reachable_spaces = piece.moves
 
-    if piece.moves.include?(end_pos)
+    # debugger
+
+    reachable_spaces.select! do |move|
+      !move_to_check?(start_pos, move, piece.color)
+    end
+
+    unless reachable_spaces.empty?
       piece.position = end_pos
-      @space[end_pos.last][end_pos.first] = piece
-      @space[start_pos.last][start_pos.first] = nil
+      @pieces[OPP_COLOR[piece.color]].delete(@spaces[end_pos.last][end_pos.first])
+      @spaces[end_pos.last][end_pos.first] = piece
+      @spaces[start_pos.last][start_pos.first] = nil
     else
       raise "Invalid move."
     end
+    self.render
     nil
+  end
+
+  def move_to_check?(start_pos, end_pos, color)
+    dup_board = self.dup
+    dup_board.spaces[end_pos.last][end_pos.first] = dup_board.spaces[start_pos.last][start_pos.first]
+    dup_board.spaces[start_pos.last][start_pos.first] = nil
+    dup_board.in_check?(color)
   end
 
   def in_check?(color)
@@ -109,10 +122,14 @@ class Board
   end
 
   def my_piece?(pos, color)
-    if self[pos] == color
-      true
-    else
-      false
+    begin
+      if self[pos].color == color
+        return true
+      else
+        return false
+      end
+    rescue NoMethodError
+      return false
     end
   end
 
@@ -120,12 +137,26 @@ class Board
     if pos.any? { |coord| coord > 7 || coord < 0 }
       raise OffBoardException
     end
-    @spaces[y][x]
+    @spaces[pos.last][pos.first]
   end
 
 end
 
-# new_board = Board.new
+class OffBoardException < RuntimeError
+end
+
+new_board = Board.new
+
+puts "we are moving the pawn"
+new_board.move([5, 6], [5, 5]) #white pawn
+puts "throw me an error"
+new_board.move([4, 1], [4, 3]) #pawn moves out of the way too late
+puts "we are moving the queen"
+new_board.move([3, 0], [7, 4]) #black queen over a pawn
+puts "throw me an error (final white pawn - move_to_check test)"
+new_board.move([6, 6], [6, 4]) #pawn moves into check
+puts "We fail"
+
 #
 # new_board.spaces.each do |row|
 #   row.each do |tile|
