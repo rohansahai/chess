@@ -91,6 +91,7 @@ class Board
   def move_to_check?(start_pos, end_pos, color)
     dup_board = self.dup
     dup_board.spaces[end_pos.last][end_pos.first] = dup_board.spaces[start_pos.last][start_pos.first]
+    dup_board.spaces[end_pos.last][end_pos.first].position = end_pos
     dup_board.spaces[start_pos.last][start_pos.first] = nil
     dup_board.in_check?(color)
   end
@@ -98,7 +99,9 @@ class Board
   def in_check?(color)
     king_pos = find_king_position(color)
 
-    @pieces[OPP_COLOR[color]].each do |piece|
+    self.pieces[OPP_COLOR[color]].each do |piece|
+      piece.class if piece.class == Queen
+      piece.moves if piece.class == Queen
       return true if piece.moves.include?(king_pos)
     end
     false
@@ -107,6 +110,8 @@ class Board
   def checkmate?(color)
     @pieces[color].each do |piece|
       checkmate = piece.valid_moves.all? do |move|
+        p move if piece.class == King
+
         move_to_check?(piece.position, move, piece.color)
       end
       p checkmate
@@ -166,8 +171,6 @@ new_board.move([6, 6], [6, 4]) #pawn moves into check
 puts "we are moving the queen"
 new_board.move([3, 0], [7, 4]) #black queen over a pawn
 p new_board.checkmate?(:white)
-
-puts "We fail"
 
 #
 # new_board.spaces.each do |row|
