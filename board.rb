@@ -3,7 +3,7 @@ require 'colorize'
 require 'debugger'
 
 class Board
-  attr_accessor :spaces, :pieces
+  attr_accessor :spaces, :pieces, :cursor_pos
   OPP_COLOR = {:black => :white, :white => :black}
   GRID_COLOR = {:light_black => :white, :white => :light_black}
   GRID = {
@@ -21,6 +21,7 @@ class Board
     @spaces = Array.new(8) { Array.new(8) }
     @pieces = {:white => [], :black => []}
     populate unless options[:empty]
+    @cursor_pos = [4, 6]
   end
 
   def populate
@@ -72,8 +73,16 @@ class Board
     puts "   " + ('a'..'h').to_a.join('  ')
     square_color = :white
     @spaces.each_with_index do |row, r_idx|
-      # puts ''.colorize(:background => :light_magenta)
-      d_row = row.map{ |piece| piece ? " #{piece.to_show} " : ' _ ' }
+      d_row = row.map.with_index do |piece, c_idx|
+        if piece
+          str = " #{piece.to_show} "
+          str = "$#{piece.to_show}$".blink if [c_idx, r_idx] == @cursor_pos
+        else
+          str = '   '
+          str = "$ $".blink if [c_idx, r_idx] == @cursor_pos
+        end
+        str
+      end
       print GRID[r_idx] + ' '
       d_row.each do |space|
         print space.colorize(:background => square_color)
@@ -98,7 +107,7 @@ class Board
 
     if reachable_spaces.include?(end_pos)
       piece.position = end_pos
-      @pieces[OPP_COLOR[piece.color]].delete(@spaces[end_pos.last][end_pos.first])
+      remove_piece(end_pos)
       @spaces[end_pos.last][end_pos.first] = piece
       @spaces[start_pos.last][start_pos.first] = nil
     else
@@ -108,8 +117,16 @@ class Board
     nil
   end
 
+  def remove_piece(pos)
+    piece = @spaces[pos.last][pos.first]
+    return unless piece
+    @pieces[piece.color].delete(piece)
+    nil
+  end
+
   def move_to_check?(start_pos, end_pos, color)
     dup_board = self.dup
+    dup_board.remove_piece(end_pos)
     dup_board.spaces[end_pos.last][end_pos.first] = dup_board.spaces[start_pos.last][start_pos.first]
     dup_board.spaces[end_pos.last][end_pos.first].position = end_pos
     dup_board.spaces[start_pos.last][start_pos.first] = nil
