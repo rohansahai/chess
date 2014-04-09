@@ -32,7 +32,7 @@ class Piece
         new_move =  [new_x, new_y]
 
         break if board.off_board?(new_move) || board.my_piece?(new_move, @color)
-        # break if move_to_check?(new_move)
+
         moves << new_move
         break if board[new_move] #will return nil if no piece
       end
@@ -180,8 +180,6 @@ class Pawn < Piece
           break if !board[new_move]
           break if board.my_piece?(new_move, @color)
         end
-
-        # break if move_to_check?(new_move)
 
         moves << new_move
 

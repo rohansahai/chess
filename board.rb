@@ -72,13 +72,13 @@ class Board
     raise "No piece at start." unless piece
     reachable_spaces = piece.moves
 
-    # debugger
+    debugger
 
     reachable_spaces.select! do |move|
       !move_to_check?(start_pos, move, piece.color)
     end
 
-    unless reachable_spaces.empty?
+    if reachable_spaces.include?(end_pos)
       piece.position = end_pos
       @pieces[OPP_COLOR[piece.color]].delete(@spaces[end_pos.last][end_pos.first])
       @spaces[end_pos.last][end_pos.first] = piece
