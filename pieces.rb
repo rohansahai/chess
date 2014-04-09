@@ -78,7 +78,11 @@ end
 class King < Piece
   DISPLAY = {:white => "\u2654".white, :black => "\u265a".black}
   def moves
-    valid_moves(Piece::ORTHOGONAL + Piece::DIAGONAL)
+    valid_moves
+  end
+
+  def valid_moves
+    super(Piece::ORTHOGONAL + Piece::DIAGONAL)
   end
 
   def to_show
@@ -100,7 +104,11 @@ class Knight < Piece
   ]
 
   def moves
-    valid_moves(KNIGHT_MOVES)
+    valid_moves
+  end
+
+  def valid_moves
+    super(KNIGHT_MOVES)
   end
 
   def to_show
@@ -111,7 +119,11 @@ end
 class Bishop < SlidingPiece
   DISPLAY = {:white => "\u2657".white, :black => "\u265d".black}
   def moves
-    valid_moves(move_dirs(Piece::DIAGONAL))
+    valid_moves
+  end
+
+  def valid_moves
+    super(move_dirs(Piece::DIAGONAL))
   end
 
   def to_show
@@ -122,7 +134,11 @@ end
 class Rook < SlidingPiece
   DISPLAY = {:white => "\u2656".white, :black => "\u265c".black}
   def moves
-    valid_moves(move_dirs(Piece::ORTHOGONAL))
+    valid_moves
+  end
+
+  def valid_moves
+    super(move_dirs(Piece::ORTHOGONAL))
   end
 
   def to_show
@@ -133,7 +149,11 @@ end
 class Queen < SlidingPiece
   DISPLAY = {:white => "\u2655".white, :black => "\u265b".black}
   def moves
-    valid_moves(move_dirs(Piece::ORTHOGONAL + Piece::DIAGONAL))
+    valid_moves
+  end
+
+  def valid_moves
+    super(move_dirs(Piece::ORTHOGONAL + Piece::DIAGONAL))
   end
 
   def to_show
@@ -161,12 +181,12 @@ class Pawn < Piece
   }
 
   def moves
-    valid_moves(PAWN_MOVES[@color])
+    valid_moves
   end
 
-  def valid_moves(modifiers)
+  def valid_moves
     moves = []
-    modifiers.each do |direction|
+    PAWN_MOVES[@color].each do |direction|
       direction.each do |modifier|
         new_x = modifier.first + self.position.first
         new_y = modifier.last + self.position.last

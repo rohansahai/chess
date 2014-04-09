@@ -72,8 +72,6 @@ class Board
     raise "No piece at start." unless piece
     reachable_spaces = piece.moves
 
-    debugger
-
     reachable_spaces.select! do |move|
       !move_to_check?(start_pos, move, piece.color)
     end
@@ -104,6 +102,18 @@ class Board
       return true if piece.moves.include?(king_pos)
     end
     false
+  end
+
+  def checkmate?(color)
+    @pieces[color].each do |piece|
+      checkmate = piece.valid_moves.all? do |move|
+        move_to_check?(piece.position, move, piece.color)
+      end
+      p checkmate
+      #debugger
+      return false unless checkmate
+    end
+    true
   end
 
   def find_king_position(color)
@@ -151,10 +161,12 @@ puts "we are moving the pawn"
 new_board.move([5, 6], [5, 5]) #white pawn
 puts "throw me an error"
 new_board.move([4, 1], [4, 3]) #pawn moves out of the way too late
-puts "we are moving the queen"
-new_board.move([3, 0], [7, 4]) #black queen over a pawn
 puts "throw me an error (final white pawn - move_to_check test)"
 new_board.move([6, 6], [6, 4]) #pawn moves into check
+puts "we are moving the queen"
+new_board.move([3, 0], [7, 4]) #black queen over a pawn
+p new_board.checkmate?(:white)
+
 puts "We fail"
 
 #
