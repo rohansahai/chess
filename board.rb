@@ -69,7 +69,6 @@ class Board
   end
 
   def render
-    system("clear")
     puts "   " + ('a'..'h').to_a.join('  ')
     square_color = :white
     @spaces.each_with_index do |row, r_idx|
@@ -113,7 +112,6 @@ class Board
     else
       raise InvalidMove
     end
-    self.render
     nil
   end
 
