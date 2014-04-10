@@ -4,6 +4,8 @@ require 'debugger'
 
 class Board
   attr_accessor :spaces, :pieces, :cursor_pos
+
+  CURSOR = "$".blink.blue
   OPP_COLOR = {:black => :white, :white => :black}
   GRID_COLOR = {:light_black => :white, :white => :light_black}
   GRID = {
@@ -75,11 +77,12 @@ class Board
       d_row = row.map.with_index do |piece, c_idx|
         if piece
           str = " #{piece.to_show} "
-          str = "$#{piece.to_show}$".blink if [c_idx, r_idx] == @cursor_pos
+          str = CURSOR + "#{piece.to_show}" + CURSOR if [c_idx, r_idx] == @cursor_pos
         else
           str = '   '
-          str = "$ $".blink if [c_idx, r_idx] == @cursor_pos
+          str = CURSOR + " " + CURSOR if [c_idx, r_idx] == @cursor_pos
         end
+
         str
       end
       print GRID[r_idx] + ' '
