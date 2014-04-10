@@ -185,6 +185,20 @@ class Board
     @spaces[pos.last][pos.first]
   end
 
+  def blitzkrieg(color)
+    modifier = {:white => -2, :black => 2}
+    pawns = @pieces[color].select {|piece| piece.is_a?(Pawn)}
+    pawns.each do |pawn|
+      new_x = pawn.position.first
+      new_y = pawn.position.last + modifier[color]
+      begin
+        move(pawn.position, [new_x, new_y])
+      rescue InvalidMove
+        next
+      end
+    end
+  end
+
 end
 
 class OffBoardException < RuntimeError
@@ -192,34 +206,4 @@ end
 
 class InvalidMove < RuntimeError
 end
-
-# new_board = Board.new
-#
-# puts "we are moving the pawn"
-# new_board.move([5, 6], [5, 5]) #white pawn
-# puts "throw me an error"
-# new_board.move([4, 1], [4, 3]) #pawn moves out of the way too late
-# puts "throw me an error (final white pawn - move_to_check test)"
-# new_board.move([6, 6], [6, 4]) #pawn moves into check
-# puts "we are moving the queen"
-# new_board.move([3, 0], [7, 4]) #black queen over a pawn
-# p new_board.checkmate?(:white)
-
-#
-# new_board.spaces.each do |row|
-#   row.each do |tile|
-#     next if tile.nil?
-#     p tile.class
-#     p tile.position
-#   end
-# end
-# puts "DUPING BEGIN"
-# dup_board = new_board.dup
-# dup_board.spaces.each do |row|
-#   row.each do |tile|
-#     next if tile.nil?
-#     p tile.class
-#     p tile.position
-#   end
-# end
 

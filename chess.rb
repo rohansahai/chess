@@ -17,21 +17,25 @@ class Game
       create_players
     end
     system("clear")
+    warning = nil
 
     until @board.checkmate?(@current_player[:color])
-      warning = nil
+
 
       begin
         input = get_move(warning)
         break unless input.is_a?(Array)
         @board.move(*input)
+        warning = nil
       rescue InvalidMove
         system("clear")
         warning = "\nThat's an invalid move."
         retry
+      rescue Blitzkrieg
+        @board.blitzkrieg(@current_player[:color])
+        warning = "\nBLIZTKRIEG!!!!"
       end
       @current_player = @players[OPP_COLOR[@current_player[:color]]]
-
     end
 
     if @board.checkmate?(@current_player[:color])
@@ -105,11 +109,6 @@ class Game
       begin
         system("stty raw -echo")
         str = STDIN.getc
-
-        # raise RuntimeError if str == 'h'
-#       rescue RuntimeError
-#         puts instructions
-#         retry
       ensure
         system("stty -raw echo")
       end
@@ -123,6 +122,8 @@ class Game
         return str
       when 'q'
         return str
+      when 'b'
+        raise Blitzkrieg
       when 'h'
         instructions = "\r\nUse the j,k,i, and l keys to move the cursor!" \
         "\n\rPress the space bar to select a piece to move." \
@@ -146,6 +147,9 @@ class InvalidInput < RuntimeError
 end
 
 class NachYoPeace < RuntimeError
+end
+
+class Blitzkrieg < RuntimeError
 end
 
 new_game = Game.new
