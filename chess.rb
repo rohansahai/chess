@@ -34,6 +34,14 @@ class Game
       rescue Blitzkrieg
         @board.blitzkrieg(@current_player[:color])
         warning = "\nBLIZTKRIEG!!!!"
+      rescue Castling
+        castled = @board.castle(@current_player[:color])
+        if castled
+          warning = "#{@current_player[:color]} has castled."
+        else
+          warning = "#{@current_player[:color]} is unable to castle"
+          retry
+        end
       end
       @current_player = @players[OPP_COLOR[@current_player[:color]]]
     end
@@ -124,6 +132,8 @@ class Game
         return str
       when 'b'
         raise Blitzkrieg
+      when 'c'
+        raise Castling
       when 'h'
         instructions = "\r\nUse the j,k,i, and l keys to move the cursor!" \
         "\n\rPress the space bar to select a piece to move." \
@@ -150,6 +160,9 @@ class NachYoPeace < RuntimeError
 end
 
 class Blitzkrieg < RuntimeError
+end
+
+class Castling < RuntimeError
 end
 
 new_game = Game.new

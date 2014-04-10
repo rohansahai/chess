@@ -2,7 +2,7 @@ require 'colorize'
 require 'debugger'
 
 class Piece
-  attr_accessor :position, :board, :color
+  attr_accessor :position, :board, :color, :moved
 
   ORTHOGONAL = [
     [[-1, 0]],
@@ -21,6 +21,7 @@ class Piece
     @position = position
     @board = board
     @color = color
+    @moved = false
   end
 
   def valid_moves(modifiers)
@@ -214,22 +215,3 @@ class Pawn < Piece
     DISPLAY[@color]
   end
 end
-
-
-#
-# puts "Queen:"
-# p Queen.new([0,0]).moves
-# puts "Bishop:"
-# p Bishop.new([0,0]).moves
-# puts "Rook:"
-# p Rook.new([0,0]).moves
-# puts "Knight:"
-# p Knight.new([0,0]).moves
-# puts "King:"
-# p King.new([0,0]).moves
-
-# puts "Pawn: "
-# p Pawn.new([0,6], nil, :white).to_show
-# p Pawn.new([0,1], nil, :black).to_show
-
-

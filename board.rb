@@ -107,6 +107,7 @@ class Board
     if reachable_spaces.include?(end_pos)
       piece.position = end_pos
       remove_piece(end_pos)
+      piece.moved = true
       @spaces[end_pos.last][end_pos.first] = piece
       @spaces[start_pos.last][start_pos.first] = nil
     else
@@ -197,6 +198,38 @@ class Board
         next
       end
     end
+  end
+
+  def castle(color)
+    coords = { :black => [[4, 0], [7, 0]], :white => [[4, 7], [7, 7]] }
+
+    king = self[coords[color].first]
+    rook = self[coords[color].last]
+
+    return false if king.moved || rook.moved || self.in_check?(color)
+
+    duped_board = self.dup
+    begin
+      duped_board.move(king.position,[(king.position.first + 1), king.position.last])
+      duped_board.move([(king.position.first + 1), king.position.last],[(king.position.first + 2), king.position.last])
+      # next three lines reassign grid coordinate to point to rook
+          # and reassign rook internal position to new coords
+      duped_board.spaces[rook.position.last][rook.position.first - 2] = duped_board.spaces[rook.position.last][rook.position.first]
+      duped_board.spaces[rook.position.last][rook.position.first - 2].position = rook.position
+      duped_board.spaces[rook.position.last][rook.position.first] = nil
+      raise InvalidMove if duped_board.in_check?(color)
+    rescue InvalidMove
+      return false
+    end
+
+    self.move(king.position,[(king.position.first + 1), king.position.last])
+    self.move(king.position,[(king.position.first + 1), king.position.last])
+
+    self.spaces[rook.position.last][rook.position.first - 2] = self.spaces[rook.position.last][rook.position.first]
+    self.spaces[rook.position.last][rook.position.first - 2].position = rook.position
+    self.spaces[rook.position.last][rook.position.first] = nil
+
+    true
   end
 
 end
